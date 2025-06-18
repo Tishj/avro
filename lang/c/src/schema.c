@@ -1963,7 +1963,9 @@ avro_schema_to_json2(const avro_schema_t schema, avro_writer_t out,
 
 	int rval;
 
-	if (is_avro_primitive(schema)) {
+	if (is_avro_null(schema)) {
+		check(rval, avro_write_str(out, "\"null\""));
+	} else if (is_avro_primitive(schema)) {
 		check(rval, avro_write_str(out, "{\"type\":\""));
 	}
 
@@ -1990,7 +1992,6 @@ avro_schema_to_json2(const avro_schema_t schema, avro_writer_t out,
 		check(rval, avro_write_str(out, "boolean"));
 		break;
 	case AVRO_NULL:
-		check(rval, avro_write_str(out, "null"));
 		break;
 	case AVRO_RECORD:
 		return write_record(out, avro_schema_to_record(schema), parent_namespace);
@@ -2008,7 +2009,7 @@ avro_schema_to_json2(const avro_schema_t schema, avro_writer_t out,
 		return write_link(out, avro_schema_to_link(schema), parent_namespace);
 	}
 
-	if (is_avro_primitive(schema)) {
+	if (is_avro_primitive(schema) && !is_avro_null(schema)) {
 		return avro_write_str(out, "\"}");
 	}
 	avro_set_error("Unknown schema type");
