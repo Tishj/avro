@@ -440,11 +440,11 @@ static int file_read_block_count(avro_file_reader_t r)
 	int64_t len;
 	const avro_encoding_t *enc = &avro_binary_encoding;
 
-	if (is_memory_io(r->reader) && avro_reader_is_eof(r->reader)) {
-		return EOF;
-	}
 	/* For a correctly formatted file, EOF will occur here */
 	rval = enc->read_long(r->reader, &r->blocks_total);
+	if (rval == EOF) {
+		return rval;
+	}
 
 	if (rval == EILSEQ && avro_reader_is_eof(r->reader)) {
 		return EOF;

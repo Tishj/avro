@@ -264,6 +264,9 @@ int avro_read(avro_reader_t reader, void *buf, int64_t len)
 {
 	if (buf && len >= 0) {
 		if (is_memory_io(reader)) {
+			if (avro_reader_is_eof(r->reader)) {
+				return EOF;
+			}
 			return avro_read_memory(avro_reader_to_memory(reader),
 						buf, len);
 		} else if (is_file_io(reader)) {
